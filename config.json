@@ -1,0 +1,21 @@
+{
+  "location": {
+    "name": "上海",
+    "latitude": 31.2304,
+    "longitude": 121.4737,
+    "timezone": "Asia/Shanghai"
+  },
+  "enabled_weather": [
+    "rain",
+    "thunderstorm"
+  ],
+  "thresholds": {
+    "wind_mps": 10.8,
+    "hot_c": 35,
+    "cold_c": 0
+  },
+  "notifications": [
+    "github"
+  ]
+}
+

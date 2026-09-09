@@ -1,0 +1,82 @@
+name: 天气监测与推送
+
+on:
+  schedule:
+    # GitHub Actions 使用 UTC；每 10 分钟检查一次。
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "只测试天气查询，不发送通知"
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: weather-watch
+  cancel-in-progress: false
+
+jobs:
+  check-weather:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      LOCATION_NAME: ${{ vars.LOCATION_NAME }}
+      LATITUDE: ${{ vars.LATITUDE }}
+      LONGITUDE: ${{ vars.LONGITUDE }}
+      TIMEZONE: ${{ vars.TIMEZONE }}
+      WEATHER_TYPES: ${{ vars.WEATHER_TYPES }}
+      NOTIFICATION_CHANNELS: ${{ vars.NOTIFICATION_CHANNELS }}
+      PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+      SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
+      BARK_KEY: ${{ secrets.BARK_KEY }}
+      BARK_URL: ${{ secrets.BARK_URL }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+      GITHUB_TOKEN: ${{ github.token }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+
+    steps:
+      - name: 获取代码
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: 设置 Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: 运行测试
+        run: python -m unittest discover -s tests -v
+
+      - name: 检查天气
+        shell: bash
+        run: |
+          args=()
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.dry_run }}" == "true" ]]; then
+            args+=(--dry-run)
+          fi
+          python src/weather_push.py "${args[@]}"
+
+      - name: 保存天气状态
+        if: success() && hashFiles('.weather-state.json') != ''
+        shell: bash
+        run: |
+          if git diff --quiet -- .weather-state.json && ! git ls-files --error-unmatch .weather-state.json >/dev/null 2>&1; then
+            git add -f .weather-state.json
+          elif git diff --quiet -- .weather-state.json; then
+            exit 0
+          else
+            git add -f .weather-state.json
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: 更新天气监测状态 [skip ci]"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

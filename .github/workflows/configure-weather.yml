@@ -1,0 +1,91 @@
+name: 配置天气类型
+
+on:
+  workflow_dispatch:
+    inputs:
+      rain:
+        description: "下雨（含毛毛雨、阵雨和伴雨雷暴）"
+        type: boolean
+        default: true
+      snow:
+        description: "下雪"
+        type: boolean
+        default: false
+      thunderstorm:
+        description: "雷暴"
+        type: boolean
+        default: true
+      fog:
+        description: "大雾"
+        type: boolean
+        default: false
+      wind:
+        description: "大风"
+        type: boolean
+        default: false
+      hot:
+        description: "高温"
+        type: boolean
+        default: false
+      cold:
+        description: "低温"
+        type: boolean
+        default: false
+      cloudy:
+        description: "多云或阴天"
+        type: boolean
+        default: false
+      clear:
+        description: "晴天"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: weather-configuration
+  cancel-in-progress: false
+
+jobs:
+  save-selection:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SELECT_RAIN: ${{ inputs.rain }}
+      SELECT_SNOW: ${{ inputs.snow }}
+      SELECT_THUNDERSTORM: ${{ inputs.thunderstorm }}
+      SELECT_FOG: ${{ inputs.fog }}
+      SELECT_WIND: ${{ inputs.wind }}
+      SELECT_HOT: ${{ inputs.hot }}
+      SELECT_COLD: ${{ inputs.cold }}
+      SELECT_CLOUDY: ${{ inputs.cloudy }}
+      SELECT_CLEAR: ${{ inputs.clear }}
+
+    steps:
+      - name: 获取代码
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: 设置 Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: 保存选择
+        run: python src/configure_weather.py
+
+      - name: 提交配置
+        shell: bash
+        run: |
+          if git diff --quiet -- config.json; then
+            echo "配置没有变化"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add config.json
+          git commit -m "配置天气推送类型"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

@@ -12,6 +12,7 @@ from src.weather_push import (
     classify_weather,
     load_state,
     run,
+    run_notification_test,
     save_state,
 )
 
@@ -113,6 +114,23 @@ class StateTests(unittest.TestCase):
                 exit_code = run(config_path, state_path, dry_run=True)
             self.assertEqual(0, exit_code)
             self.assertFalse(state_path.exists())
+
+
+class NotificationTests(unittest.TestCase):
+    def test_notification_test_uses_configured_channel(self):
+        config = {
+            "location": {"name": "测试城市", "latitude": 1, "longitude": 2, "timezone": "UTC"},
+            "enabled_weather": ["rain"],
+            "notifications": ["pushplus"],
+        }
+        with tempfile.TemporaryDirectory() as folder:
+            config_path = Path(folder) / "config.json"
+            config_path.write_text(json.dumps(config, ensure_ascii=False), encoding="utf-8")
+            with patch("src.weather_push.send_notifications", return_value=True) as sender:
+                exit_code = run_notification_test(config_path)
+        self.assertEqual(0, exit_code)
+        self.assertEqual(["pushplus"], sender.call_args.args[0])
+        self.assertEqual("天气推送测试成功", sender.call_args.args[1])
 
 
 if __name__ == "__main__":

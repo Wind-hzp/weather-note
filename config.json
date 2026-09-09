@@ -15,7 +15,6 @@
     "cold_c": 0
   },
   "notifications": [
-    "github"
+    "pushplus"
   ]
 }
-

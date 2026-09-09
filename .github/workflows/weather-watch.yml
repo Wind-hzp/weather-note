@@ -11,6 +11,11 @@ on:
         required: true
         type: boolean
         default: true
+      send_test:
+        description: "立即发送一条测试通知（优先于只测试天气查询）"
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -59,7 +64,9 @@ jobs:
         shell: bash
         run: |
           args=()
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.dry_run }}" == "true" ]]; then
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.send_test }}" == "true" ]]; then
+            args+=(--test-notification)
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.dry_run }}" == "true" ]]; then
             args+=(--dry-run)
           fi
           python src/weather_push.py "${args[@]}"

@@ -21,8 +21,9 @@
 1. 在 GitHub 新建仓库，把本项目推送到仓库的默认分支。
 2. 打开仓库的 **Settings → Actions → General → Workflow permissions**，选择 **Read and write permissions** 并保存。
 3. 打开 **Actions → 配置天气类型 → Run workflow**，用复选框选择要提醒的天气并运行。
-4. 打开 **Actions → 天气监测与推送 → Run workflow**，保持“只测试”开启，先跑一次。
-5. 测试成功后再次运行并关闭“只测试”，或等待定时任务自动执行。
+4. 按下文配置微信 Token。
+5. 打开 **Actions → 天气监测与推送 → Run workflow**，勾选“立即发送一条测试通知”并运行；微信应立即收到测试消息。
+6. 测试成功后等待定时任务自动执行即可。
 
 > GitHub 的定时任务可能比设定时间晚几分钟，适合生活提醒，不适合作为灾害预警系统。
 
@@ -57,21 +58,26 @@
 
 在 `config.json` 的 `notifications` 数组中选择渠道，也可使用上面的 `NOTIFICATION_CHANNELS` 仓库变量覆盖。可以同时选多个渠道。
 
-### GitHub 通知（零额外配置）
+### PushPlus 微信推送（默认）
+
+```json
+"notifications": ["pushplus"]
+```
+
+在 [PushPlus](https://www.pushplus.plus/) 使用微信登录并关注其公众号，复制个人 token，然后在仓库 **Settings → Secrets and variables → Actions → Secrets → New repository secret** 新建：
+
+- Name：`PUSHPLUS_TOKEN`
+- Secret：刚复制的 PushPlus token
+
+保存后，微信就是默认接收渠道。Token 属于敏感信息，请勿写入 `config.json` 或提交到仓库。
+
+### GitHub 通知（备用）
 
 ```json
 "notifications": ["github"]
 ```
 
 开始下雨时会在仓库新建一个标题含 `[weather-alert]` 的 Issue。安装 GitHub 手机 App，并把该仓库的 Watch 设置为包含 Issues，即可收到手机提醒。
-
-### PushPlus 微信推送
-
-```json
-"notifications": ["pushplus"]
-```
-
-在 PushPlus 获取 token，然后在仓库 **Settings → Secrets and variables → Actions → Secrets** 新建 `PUSHPLUS_TOKEN`。
 
 ### Server酱微信推送
 

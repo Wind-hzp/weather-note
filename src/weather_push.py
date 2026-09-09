@@ -430,13 +430,34 @@ def run(config_path: Path, state_path: Path, dry_run: bool = False) -> int:
     return 0
 
 
+def run_notification_test(config_path: Path) -> int:
+    config = apply_env_overrides(load_config(config_path))
+    weather = CurrentWeather(
+        code=0,
+        temperature_c=0,
+        apparent_temperature_c=0,
+        precipitation_mm=0,
+        wind_mps=0,
+        observed_at=datetime.now().astimezone().isoformat(timespec="minutes"),
+    )
+    title = "天气推送测试成功"
+    body = f"{config['location']['name']}的天气提醒已连接，今后命中所选天气时会自动推送。"
+    if send_notifications(config.get("notifications", ["github"]), title, body, set(), weather):
+        return 0
+    print("::error::所有测试通知渠道均发送失败", file=sys.stderr)
+    return 1
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="天气变化推送")
     parser.add_argument("--config", type=Path, default=Path("config.json"))
     parser.add_argument("--state", type=Path, default=Path(".weather-state.json"))
     parser.add_argument("--dry-run", action="store_true", help="只打印通知，不实际发送")
+    parser.add_argument("--test-notification", action="store_true", help="立即发送一条测试通知")
     args = parser.parse_args()
     try:
+        if args.test_notification:
+            return run_notification_test(args.config)
         return run(args.config, args.state, args.dry_run)
     except WeatherPushError as exc:
         print(f"::error::{exc}", file=sys.stderr)

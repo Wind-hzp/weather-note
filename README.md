@@ -36,9 +36,9 @@
 ```json
 {
   "location": {
-    "name": "上海",
-    "latitude": 31.2304,
-    "longitude": 121.4737,
+    "name": "济南市天桥区堤口路大润发",
+    "latitude": 36.674318,
+    "longitude": 116.981568,
     "timezone": "Asia/Shanghai"
   },
   "enabled_weather": ["rain", "thunderstorm"]

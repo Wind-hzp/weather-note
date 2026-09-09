@@ -7,7 +7,9 @@
   },
   "enabled_weather": [
     "rain",
-    "thunderstorm"
+    "thunderstorm",
+    "cold",
+    "cloudy"
   ],
   "thresholds": {
     "wind_mps": 10.8,

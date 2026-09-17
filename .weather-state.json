@@ -1,11 +1,9 @@
 {
   "version": 1,
-  "active": [
-    "rain"
-  ],
-  "updated_at": "2026-09-17T09:58:17+00:00",
+  "active": [],
+  "updated_at": "2026-09-17T14:49:57+00:00",
   "last_observation": {
-    "weather_code": 51,
-    "observed_at": "2026-09-17T17:45"
+    "weather_code": 0,
+    "observed_at": "2026-09-17T22:45"
   }
 }

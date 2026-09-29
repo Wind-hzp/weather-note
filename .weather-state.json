@@ -1,9 +1,11 @@
 {
   "version": 1,
-  "active": [],
-  "updated_at": "2026-09-28T21:55:08+00:00",
+  "active": [
+    "cloudy"
+  ],
+  "updated_at": "2026-09-29T23:07:41+00:00",
   "last_observation": {
-    "weather_code": 0,
-    "observed_at": "2026-09-29T05:45"
+    "weather_code": 3,
+    "observed_at": "2026-09-30T07:00"
   }
 }

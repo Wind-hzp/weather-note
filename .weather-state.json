@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active": [
-    "cloudy"
+    "rain"
   ],
-  "updated_at": "2026-09-29T23:07:41+00:00",
+  "updated_at": "2026-09-30T02:05:24+00:00",
   "last_observation": {
-    "weather_code": 3,
-    "observed_at": "2026-09-30T07:00"
+    "weather_code": 51,
+    "observed_at": "2026-09-30T10:00"
   }
 }

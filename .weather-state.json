@@ -1,9 +1,11 @@
 {
   "version": 1,
-  "active": [],
-  "updated_at": "2026-11-18T01:21:17+00:00",
+  "active": [
+    "cold"
+  ],
+  "updated_at": "2026-11-19T21:52:14+00:00",
   "last_observation": {
     "weather_code": 0,
-    "observed_at": "2026-11-18T09:15"
+    "observed_at": "2026-11-20T05:45"
   }
 }
